@@ -1,4 +1,3 @@
-
 name: Deploy to Cloud Provider
 on:
   workflow_call:
@@ -7,12 +6,20 @@ on:
         description: 'Cloud provider to deploy to (google or aws)'
         required: true
         type: string
+      ambiente:
+        description: 'Environment to deploy to (dev, staging, prod)'
+        required: true
+        type: string
+      manifest:
+        description: 'Path to the Kubernetes manifest file'
+        required: true
+        type: string
     secrets:
+      cluster_name:
+        required: false
       project_id:
         required: false
       region:
-        required: false
-      cluster_name:
         required: false
       credentials_json:
         required: false
@@ -22,6 +29,7 @@ on:
         required: false
 jobs:
   deploy:
+    environment: ${{ inputs.ambiente }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -32,19 +40,39 @@ jobs:
       # --------------------
       - name: Authenticate with Google Cloud
         if: ${{ inputs.provider == 'google'}}
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.credentials_json }}
-          project_id: ${{ secrets.project_id }}
+        run: |
+          echo "Aqui estamos simulando a autenticação com o Google Cloud no ambiente ${{ inputs.ambiente }}"
+          echo "credentials_json: ${{ secrets.credentials_json }}"
+          echo "project_id: ${{ secrets.project_id }}"
+
+      - name: Set up Google Cloud SDK
+        if: ${{ inputs.provider == 'google'}}
+        run: |
+          echo "Aqui estamos configurando o Google Cloud SDK para o ambiente ${{ inputs.ambiente }}"
+          echo "Project ID: ${{ secrets.project_id }}"
+          echo "Region: ${{ secrets.region }}"
+          echo "Cluster Name: ${{ secrets.cluster_name }}"
+          echo "Manifest Path: ${{ inputs.manifest }}"
+          echo "Deploying to Google Cloud..."
+
+
 
       # --------------------
       # AWS EKS
       # --------------------
       - name: Authenticate with AWS
         if: ${{ inputs.provider == 'aws'}}
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          aws-access-key-id: ${{ secrets.aws_access_key_id }}
-          aws-secret-access-key: ${{ secrets.aws_secret_access_key }}
-          aws-region: ${{ secrets.region }}
-      
+        run: |
+          echo "Aqui estamos simulando a autenticação com o AWS no ambiente ${{ inputs.ambiente }}"
+          echo "aws_access_key_id: ${{ secrets.aws_access_key_id }}"
+          echo "aws_secret_access_key: ${{ secrets.aws_secret_access_key }}"
+
+      - name: Set up AWS CLI
+        if: ${{ inputs.provider == 'aws'}}
+        run: |
+          echo "Aqui estamos configurando o AWS CLI para o ambiente ${{ inputs.ambiente }}"
+          echo "Project ID: ${{ secrets.project_id }}"
+          echo "Region: ${{ secrets.region }}"
+          echo "Cluster Name: ${{ secrets.cluster_name }}"
+          echo "Manifest Path: ${{ inputs.manifest }}"
+          echo "Deploying to AWS EKS..."

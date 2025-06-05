@@ -29,27 +29,37 @@ jobs:
       # --------------------
       # Google Cloud
       # --------------------
-      - name: Subistitue imagem no manifest
+      - name: Substitute image in manifest
         if: ${{ inputs.provider == 'google' }}
         run: |
           echo "Substituindo a imagem no manifest ${{ inputs.manifest }} com a tag ${{ inputs.image_tag }}"
           sed -i "s|image:.*|image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dev-repo-gke/app-image:${{ inputs.image_tag }}|g" ${{ inputs.manifest }}
 
-      - name: Autenticate with Google Cloud
+      - name: Setup Google Cloud SDK
+        if: ${{ inputs.provider == 'google' }}
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          version: '410.0.0'  # Pin a stable version
+
+      - name: Authenticate with Google Cloud
         if: ${{ inputs.provider == 'google' }}
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Deploy to GKE
+      - name: Get GKE credentials
         if: ${{ inputs.provider == 'google' }}
-        uses: google-github-actions/deploy-gke@v0.0.3
+        uses: google-github-actions/get-gke-credentials@v1
         with:
           cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
           location: ${{ secrets.GKE_LOCATION }}
-          manifest: ${{ inputs.manifest }}
-          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dev-repo-gke/app-image:${{ inputs.image_tag }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Apply Kubernetes manifest
+        if: ${{ inputs.provider == 'google' }}
+        run: |
+          kubectl apply -f ${{ inputs.manifest }} --record
 
 
       # --------------------

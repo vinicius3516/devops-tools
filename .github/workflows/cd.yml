@@ -14,6 +14,10 @@ on:
         description: 'Path to the Kubernetes manifest file'
         required: true
         type: string
+      image_tag:
+        description: 'Docker image tag to use for deployment'
+        required: true
+        type: string
 jobs:
   deploy:
     environment: ${{ inputs.ambiente }}
@@ -25,23 +29,21 @@ jobs:
       # --------------------
       # Google Cloud
       # --------------------
-      - name: Authenticate with Google Cloud
-        if: ${{ inputs.provider == 'google'}}
-        run: |
-          echo "Aqui estamos simulando a autenticação com o Google Cloud no ambiente ${{ inputs.ambiente }}"
-          echo "credentials_json: ${{ secrets.credentials_json }}"
-          echo "project_id: ${{ secrets.project_id }}"
+      - name: Autenticate with Google Cloud
+        if: ${{ inputs.provider == 'google' }}
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Set up Google Cloud SDK
-        if: ${{ inputs.provider == 'google'}}
-        run: |
-          echo "Aqui estamos configurando o Google Cloud SDK para o ambiente ${{ inputs.ambiente }}"
-          echo "Project ID: ${{ secrets.project_id }}"
-          echo "Region: ${{ secrets.region }}"
-          echo "Cluster Name: ${{ secrets.cluster_name }}"
-          echo "Manifest Path: ${{ inputs.manifest }}"
-          echo "Deploying to Google Cloud..."
-
+      - name: Deploy to GKE
+        if: ${{ inputs.provider == 'google' }}
+        uses: google-github-actions/deploy-gke@v4.1.5
+        with:
+          cluster_name: ${{ secrets.GKE_CLUSTER_NAME }}
+          location: ${{ secrets.GKE_LOCATION }}
+          manifest: ${{ inputs.manifest }}
+          image: us-central1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dev-repo-gke/app-image:${{ inputs.image_tag }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
 
 
       # --------------------

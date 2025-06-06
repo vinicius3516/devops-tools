@@ -1,0 +1,44 @@
+name: Deploy to Cloud Provider
+on:
+  workflow_call:
+    inputs:
+      ambiente:
+        description: 'Environment to deploy to (dev, staging, prod)'
+        required: true
+        type: string
+      manifest:
+        description: 'Path to the Kubernetes manifest file'
+        required: true
+        type: string
+      image_tag:
+        description: 'Docker image tag to use for deployment'
+        required: true
+        type: string
+      kubeconfig:
+        description: 'Kubeconfig file for Digital Ocean Kubernetes'
+        required: false
+        type: string
+        default: ''
+jobs:
+  deploy:
+    environment: ${{ inputs.ambiente }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # --------------------
+      # DIGITAL OCEAN KUBERNETES
+      # --------------------
+      - name: Deploy to Digital Oceam with kubeconfig
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ inputs.kubeconfig }}
+
+      - name: Deploy to Digital Ocean
+        uses: azure/k8s-deploy@v5
+        with:
+          manifests: ${{ inputs.manifest }}
+          images: ${{ inputs.image_tag }}
+          namespace: ${{ inputs.ambiente }}

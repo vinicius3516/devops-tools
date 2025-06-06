@@ -24,6 +24,8 @@ jobs:
     environment: ${{ inputs.ambiente }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       # --------------------
       # DIGITAL OCEAN KUBERNETES
       # --------------------

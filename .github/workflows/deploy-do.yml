@@ -63,6 +63,10 @@ jobs:
             DB_PASSWORD: $(echo -n "${{ secrets.DB_PASSWORD }}" | base64 -w0)
             DB_HOST: $(echo -n "${{ secrets.DB_HOST }}" | base64 -w0)
           EOF
+      - name: Apply Kubernetes Secret
+        if: ${{ inputs.ambiente == 'dev' || inputs.ambiente == 'staging' }}
+        run: |
+          kubectl apply -f ./k8s/secret.yaml --namespace=${{ secrets.CONFIG_NAMESPACE }}
 
       - name: Deploy to Digital Ocean
         if: ${{ inputs.ambiente == 'dev' || inputs.ambiente == 'staging' }}

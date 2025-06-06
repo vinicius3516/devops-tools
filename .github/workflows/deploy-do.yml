@@ -35,9 +35,11 @@ jobs:
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
+
       - name: Validando o ambiente recebido no enviroment
         run: |
           echo "Ambiente recebido: ${{ inputs.ambiente }}"
+          echo "Ambiente configurado: ${{ secrets.CONFIG_NAMESPACE }}"
 
 
       - name: Create Kubernetes Secret

@@ -26,19 +26,36 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        
       # --------------------
       # DIGITAL OCEAN KUBERNETES
       # --------------------
-      - name: Validando recebimento do ambiente
-        run: |
-          echo "Ambiente: ${{ inputs.ambiente }}"
-          echo "Kubeconfig: ${{ secrets.KUBECONFIG }}"
-
       - name: Set Kube Context
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
+
+
+      - name: Create Kubernetes Secret
+        run: |
+          mkdir -p ./k8s
+          cat <<EOF > ./k8s/secret.yaml
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: kube-secret
+          type: Opaque
+          data:
+            POSTGRES_PASSWORD: $(echo -n "${{ secrets.POSTGRES_PASSWORD }}" | base64 -w0)
+            POSTGRES_USER: $(echo -n "${{ secrets.POSTGRES_USER }}" | base64 -w0)
+            POSTGRES_DB: $(echo -n "${{ secrets.POSTGRES_DB }}" | base64 -w0)
+            DB_DATABASE: $(echo -n "${{ secrets.DB_DATABASE }}" | base64 -w0)
+            DB_USERNAME: $(echo -n "${{ secrets.DB_USERNAME }}" | base64 -w0)
+            DB_PASSWORD: $(echo -n "${{ secrets.DB_PASSWORD }}" | base64 -w0)
+            DB_HOST: $(echo -n "${{ secrets.DB_HOST }}" | base64 -w0)
+          EOF
+
 
       - name: Deploy to Digital Ocean
         uses: azure/k8s-deploy@v5

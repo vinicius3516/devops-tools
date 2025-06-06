@@ -25,6 +25,7 @@ jobs:
       - name: Validando recebimento do ambiente
         run: |
           echo "Ambiente: ${{ inputs.ambiente }}"
+          echo "Kubeconfig: ${{ secrets.KUBECONFIG }}"
 
       - name: Set Kube Context
         uses: azure/k8s-set-context@v4

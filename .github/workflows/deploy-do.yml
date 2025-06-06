@@ -57,5 +57,7 @@ jobs:
             DB_HOST: $(echo -n "${{ secrets.DB_HOST }}" | base64 -w0)
           EOF
 
-
+      - name: Verificando secrets creadas
+        run: |
+          kubectl get secret kube-secret -n ${{ secrets.CONFIG_NAMESPACE }} -o yaml
 

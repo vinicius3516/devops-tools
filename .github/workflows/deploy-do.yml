@@ -45,7 +45,7 @@ jobs:
           kind: Secret
           metadata:
             name: kube-secret
-            namespace: desenvolvimento
+            namespace: ${{ secrets.CONFIG_NAMESPACE }}
           type: Opaque
           data:
             POSTGRES_PASSWORD: $(echo -n "${{ secrets.POSTGRES_PASSWORD }}" | base64 -w0)

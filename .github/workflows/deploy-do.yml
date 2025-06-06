@@ -14,11 +14,6 @@ on:
         description: 'Docker image tag to use for deployment'
         required: true
         type: string
-      kubeconfig:
-        description: 'Kubeconfig file for Digital Ocean Kubernetes'
-        required: false
-        type: string
-        default: ''
 jobs:
   deploy:
     environment: ${{ inputs.ambiente }}
@@ -34,11 +29,11 @@ jobs:
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
-          kubeconfig: ${{ inputs.kubeconfig }}
+          kubeconfig: ${{ secrets.KUBECONFIG }}
 
       - name: Deploy to Digital Ocean
         uses: azure/k8s-deploy@v5
         with:
           manifests: ${{ inputs.manifest }}
           images: ${{ inputs.image_tag }}
-          namespace: ${{ inputs.ambiente }}
+          namespace: ${{ secrets.CONFIG_NAMESPACE }}

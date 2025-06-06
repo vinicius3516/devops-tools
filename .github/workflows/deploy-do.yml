@@ -37,14 +37,14 @@ jobs:
           kubeconfig: ${{ secrets.KUBECONFIG }}
 
       - name: Validando o ambiente recebido no enviroment
-        if: ${{ inputs.ambiente == 'dev' || inputs.ambiente == 'staging' }}
+        if: ${{ inputs.ambiente == 'dev' }}
         run: |
           echo "Ambiente recebido: ${{ inputs.ambiente }}"
           echo "Ambiente configurado: ${{ secrets.CONFIG_NAMESPACE }}"
 
 
       - name: Create Kubernetes Secret
-        if: ${{ inputs.ambiente == 'dev' || inputs.ambiente == 'staging' }}
+        if: ${{ inputs.ambiente == 'dev' }}
         run: |
           mkdir -p ./k8s
           cat <<EOF > ./k8s/secret.yaml
@@ -64,12 +64,12 @@ jobs:
             DB_HOST: $(echo -n "${{ secrets.DB_HOST }}" | base64 -w0)
           EOF
       - name: Apply Kubernetes Secret
-        if: ${{ inputs.ambiente == 'dev' || inputs.ambiente == 'staging' }}
+        if: ${{ inputs.ambiente == 'dev' }}
         run: |
           kubectl apply -f ./k8s/secret.yaml --namespace=${{ secrets.CONFIG_NAMESPACE }}
 
       - name: Deploy to Digital Ocean
-        if: ${{ inputs.ambiente == 'dev' || inputs.ambiente == 'staging' }}
+        if: ${{ inputs.ambiente == 'dev' }}
         uses: azure/k8s-deploy@v5
         with:
           manifests: ${{ inputs.manifests }}

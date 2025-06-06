@@ -57,7 +57,10 @@ jobs:
             DB_HOST: $(echo -n "${{ secrets.DB_HOST }}" | base64 -w0)
           EOF
 
-      - name: Verificando secrets creadas
+      - name: Criar Secret no Kubernetes
+        run: |
+          kubectl apply -f ./k8s/secret.yaml
+      - name: Verificando se o Secret foi criado
         run: |
           kubectl get secret -n desenvolvimento
 

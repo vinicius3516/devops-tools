@@ -14,10 +14,6 @@ on:
         description: 'Docker image tag to use for deployment'
         required: true
         type: string
-    secrets:
-      kubeconfig:
-        description: 'Kubeconfig secret for Digital Ocean Kubernetes'
-        required: true
   
 jobs:
   deploy:

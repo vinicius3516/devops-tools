@@ -4,19 +4,19 @@ on:
         inputs:
             aws_access_key_id:
                 description: 'AWS Access Key ID'
-                required: true
+                required: false
                 type: string
             aws_secret_access_key:
                 description: 'AWS Secret Access Key'
-                required: true
+                required: false
                 type: string
             bucket_name:
                 description: 'S3 Bucket Name'
-                required: true
+                required: false
                 type: string
             region:
                 description: 'AWS Region'
-                required: true
+                required: false
                 type: string
 jobs:
     deploy-s3:

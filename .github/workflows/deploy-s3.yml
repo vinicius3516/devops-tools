@@ -1,0 +1,37 @@
+name: Deploy to S3 Bucket
+on:
+    workflow_call:
+        inputs:
+            aws_access_key_id:
+                description: 'AWS Access Key ID'
+                required: true
+                type: string
+            aws_secret_access_key:
+                description: 'AWS Secret Access Key'
+                required: true
+                type: string
+            bucket_name:
+                description: 'S3 Bucket Name'
+                required: true
+                type: string
+            region:
+                description: 'AWS Region'
+                required: true
+                type: string
+jobs:
+    deploy-s3:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  aws-access-key-id: ${{ inputs.aws_access_key_id }}
+                  aws-secret-access-key: ${{ inputs.aws_secret_access_key }}
+                  aws-region: ${{ inputs.region }}
+
+            - name: Validando login no AWS
+              run: |
+                aws sts get-caller-identity

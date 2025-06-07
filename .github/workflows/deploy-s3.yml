@@ -1,23 +1,20 @@
 name: Deploy to S3 Bucket
 on:
     workflow_call:
-        inputs:
+        secrets:
             aws_access_key_id:
                 description: 'AWS Access Key ID'
-                required: false
-                type: string
+                required: true
             aws_secret_access_key:
                 description: 'AWS Secret Access Key'
-                required: false
-                type: string
+                required: true
             bucket_name:
                 description: 'S3 Bucket Name'
-                required: false
-                type: string
+                required: true
             region:
                 description: 'AWS Region'
-                required: false
-                type: string
+                required:  true
+           
 jobs:
     deploy-s3:
         runs-on: ubuntu-latest
